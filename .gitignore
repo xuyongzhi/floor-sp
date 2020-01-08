@@ -5,3 +5,8 @@ __pycache__
 *.tar.gz*
 *.pdf
 *.pyc
+data/public_100/
+weights
+floor-sp/data
+.ropeproject
+.gitplaceholder

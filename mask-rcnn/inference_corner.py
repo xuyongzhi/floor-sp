@@ -67,7 +67,7 @@ if not os.path.exists(VIZ_DIR):
 
 for file_idx, filename in enumerate(sorted(os.listdir(data_dir))):
     file_path = os.path.join(data_dir, filename)
-    data = np.load(file_path, encoding='latin1').tolist()
+    data = np.load(file_path, encoding='latin1', allow_pickle=True).tolist()
 
     image = data['topview_image']
     room_annot = data['room_instances_annot']

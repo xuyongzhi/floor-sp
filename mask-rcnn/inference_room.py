@@ -89,7 +89,7 @@ if not os.path.exists(VIZ_DIR):
 
 for file_idx, filename in enumerate(sorted(os.listdir(data_dir))):
     file_path = os.path.join(data_dir, filename)
-    data = np.load(file_path, encoding='latin1').tolist()
+    data = np.load(file_path, encoding='latin1',allow_pickle=True).tolist()
 
     image = data['topview_image']
     room_annot = data['room_instances_annot']
@@ -119,9 +119,9 @@ for file_idx, filename in enumerate(sorted(os.listdir(data_dir))):
 
     # Visualize results
     r = results[0]
-    
-    # Control the color of generated masks by viz_colors. This is for generating consistent visualization 
-    # between masks and final reconstructed rooms. 
+
+    # Control the color of generated masks by viz_colors. This is for generating consistent visualization
+    # between masks and final reconstructed rooms.
     # read_path = '../floor-sp/results_associate/mode_room_corner_lr_0.0001_batch_size_16/processed_preds'
     # read_path = os.path.join(read_path, '{}_rooms_info.npy'.format(file_idx))
     # rooms_info = np.load(read_path).tolist()['rooms_info']
