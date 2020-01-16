@@ -96,6 +96,7 @@ class InferenceConfig(LianjiaConfig):
 
 class LianjiaDataset(utils.Dataset):
     def load_samples(self, phase, metadata_path):
+        import pdb; pdb.set_trace()  # XXX BREAKPOINT
         self.phase = phase
         # Add classes
         if phase != 'train' and phase != 'test':

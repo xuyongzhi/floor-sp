@@ -174,11 +174,11 @@ def predict(configs):
         for idx, filename in enumerate(sorted(os.listdir(data_dir))):
             file_path = os.path.join(data_dir, filename)
             with open(file_path, 'rb') as f:
-                data = np.load(f).tolist()
+                data = np.load(f,allow_pickle=True).tolist()
 
             corner_preds_path = os.path.join(corner_preds_dir, '{}_corner_preds.npy'.format(idx))
             with open(corner_preds_path, 'rb') as f:
-                corner_preds = np.load(corner_preds_path).tolist()
+                corner_preds = np.load(corner_preds_path, allow_pickle=True).tolist()
 
             room_data = data['room_data']
             room_labels = data['class_names']
@@ -305,7 +305,7 @@ def predict(configs):
 
 
 if __name__ == '__main__':
-    config_dict = load_config(file_path='/local-scratch/cjc/floor-sp/floor-sp/configs/config_associate_module.yaml')
+    config_dict = load_config(file_path='/home/z/Research/floor-sp/floor-sp/configs/config_associate_module.yaml')
     configs = Struct(**config_dict)
     extra_option = configs.extra if hasattr(configs, 'extra') else None
     config_str = compose_config_str(configs, keywords=['mode', 'lr', 'batch_size'], extra=extra_option)

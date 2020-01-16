@@ -388,7 +388,7 @@ def get_direction(pt_xy, other_xy, EPSILON=0.2):
 
 
 if __name__ == '__main__':
-    # Validate the given data by visualizing camera centers and transform point clouds 
+    # Validate the given data by visualizing camera centers and transform point clouds
     # extrinsics = get_extrinsics(EXTRINSICS_PATH)
     # visualize_camera_center(extrinsics, './')
     # for i, extrinsic_mat in enumerate(extrinsics):

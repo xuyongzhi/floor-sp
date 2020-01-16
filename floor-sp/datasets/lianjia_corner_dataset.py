@@ -25,7 +25,7 @@ class LianjiaCornerDataset(Dataset):
             self._data_path_list.append(file_path)
 
         # set image size, will be used for normalization
-        sample = np.load(self._data_path_list[0], encoding='latin1').tolist()
+        sample = np.load(self._data_path_list[0], encoding='latin1',allow_pickle=True).tolist()
         self.im_size = sample['topview_image'].shape[0]
 
     def __len__(self):
@@ -34,7 +34,7 @@ class LianjiaCornerDataset(Dataset):
     def __getitem__(self, index):
         sample_path = self._data_path_list[index]
         with open(sample_path, 'rb') as f:
-            sample_data = np.load(f, encoding='latin1').tolist()
+            sample_data = np.load(f, encoding='latin1',allow_pickle=True).tolist()
         image = np.transpose(sample_data['topview_image'], [2, 0, 1])
         mean_normal = np.transpose(sample_data['mean_normal'], [2, 0, 1])
         room_map = sample_data['room_map']

@@ -66,6 +66,9 @@ if not os.path.exists(VIZ_DIR):
     os.makedirs(VIZ_DIR)
 
 for file_idx, filename in enumerate(sorted(os.listdir(data_dir))):
+    scene_name = filename.split('.')[0]
+    if scene_name  not in ['7w6zvVsOBAQK4h4Bne7caQ', 'IDZkUGse-74FIy2OqM2u_Y', 'B9Abt6B78a0j2eRcygHjqC']:
+      continue
     file_path = os.path.join(data_dir, filename)
     data = np.load(file_path, encoding='latin1', allow_pickle=True).tolist()
 
@@ -96,8 +99,8 @@ for file_idx, filename in enumerate(sorted(os.listdir(data_dir))):
                                                           save_path='{}/{}_maskrcnn.png'.format(VIZ_DIR, file_idx))
 
 
-    cv2.imwrite('{}/{}_maskrcnn_input.png'.format(VIZ_DIR, file_idx), image)
-    cv2.imwrite('{}/{}_maskrcnn_gt.png'.format(VIZ_DIR, file_idx), annot_image)
+    cv2.imwrite('{}/{}_{}_maskrcnn_input.png'.format(VIZ_DIR, file_idx, scene_name), image)
+    cv2.imwrite('{}/{}_{}_maskrcnn_gt.png'.format(VIZ_DIR, file_idx, scene_name), annot_image)
 
     room_mask_pred = np.zeros([image.shape[0], image.shape[0]])
     for room_i, (room_contour, room_mask) in enumerate(zip(all_contours, all_masks)):

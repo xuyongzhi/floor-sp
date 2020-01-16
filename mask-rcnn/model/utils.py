@@ -280,6 +280,7 @@ class Dataset(object):
         # If grayscale. Convert to RGB for consistency.
         if image.ndim != 3:
             image = skimage.color.gray2rgb(image)
+        import pdb; pdb.set_trace()  # XXX BREAKPOINT
         return image
 
     def load_mask(self, image_id):
@@ -595,7 +596,7 @@ def primitive_detector_eval(all_dets,
                 if class_idx == 1:
                     edge_dirs_all[class_idx].append(list(det[5:]))
 
-    # compute map for every selected class    
+    # compute map for every selected class
     for class_idx in range(1, len(vocabulary)):
         npos = npos_all[class_idx]
 
