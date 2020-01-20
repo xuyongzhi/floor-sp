@@ -21,11 +21,14 @@ TOP_DOWN_VIEW_PATH = './demo_nonm/map/point_evidence_visualize_0.jpg'
 
 EXTRINSICS_PATH = './demo_nonm/final_extrinsics.txt'
 
-IMAGE_SIZE = 256
+#IMAGE_SIZE = 256
+IMAGE_SIZE = 512
 
 ANNOT_OFFSET = 37500
 ANNOT_SCALE = 1000
 
+
+RM_EDGE_0LENGTH = 1
 
 def get_extrinsics(extrinsic_path):
     with open(extrinsic_path) as f:
@@ -283,6 +286,28 @@ def process_annot(dir_path, out_path):
     #     else:
     #         break
 
+    # -------------------------------
+    # 4. clean lines with duplicate points (0 length)
+    # -------------------------------
+    if RM_EDGE_0LENGTH:
+        valid_ids = []
+        invalid_ids = []
+        for i,line in enumerate(new_lines):
+          points = line['points']
+          tmp  = point_dict[points[0]]
+          p0xy = np.array([tmp['x'], tmp['y']])
+          tmp  = point_dict[points[1]]
+          p1xy = np.array([tmp['x'], tmp['y']])
+          lineleng = np.linalg.norm(p0xy - p1xy)
+          if points[0] != points[1] and lineleng > 0.1:
+            valid_ids.append(i)
+          else:
+            print(f'lineleng: {lineleng}')
+            invalid_ids.append(i)
+        new_lines = [new_lines[i] for i in valid_ids]
+        if len(invalid_ids):
+          print(f'\n{dir_name} invalid_ids: {invalid_ids}\n')
+
     all_point_ids = [point['id'] for point in new_points]
     for idx, area in enumerate(areas):
         removed_ids = list()
@@ -398,7 +423,7 @@ if __name__ == '__main__':
 
     # Pre-processing: generate global point clouds + parse annotations (with some simple cleaning on the annotations)
     base_dir = '../data/public_100/raws'
-    out_base = '../data/public_100/processed'
+    out_base = f'../data/public_100/processed_{IMAGE_SIZE}'
     out_base_ply = osp.join(out_base, 'ply')
     out_base_json = osp.join(out_base, 'json')
     if not os.path.exists(out_base_ply):
@@ -415,9 +440,13 @@ if __name__ == '__main__':
         if not os.path.exists(annot_path):
             print('{} does not contain annotation!'.format(dir_name))
             continue
-        if os.path.exists(out_path_ply) and os.path.exists(out_path_json):
-            print('skip {}, it exists already'.format(dir_name))
-            continue
-        merge_point_clouds(file_path, out_path_ply)
-        process_annot(file_path, out_path_json)
+        if os.path.exists(out_path_ply):
+            print('skip {} ply, it exists already'.format(dir_name))
+        else:
+            merge_point_clouds(file_path, out_path_ply)
+
+        if os.path.exists(out_path_json):
+            print('skip {} json, it exists already'.format(dir_name))
+        else:
+            process_annot(file_path, out_path_json)
 

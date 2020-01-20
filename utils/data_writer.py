@@ -20,6 +20,8 @@ from utils import getDensity, drawDensityImage
 import pdb
 EPSILON = 3
 
+ONLY_NOT_EXIST = 1
+ERR_TEMP_SOL = True
 
 def _convert_room_label(room_name):
     """ Convert room label from str to index, using the mapping defined by FloorNet"""
@@ -85,10 +87,14 @@ def _get_corner_type(points, lines, point_dict, allow_non_manhattan=False):
             elif other_xy[0] < pt_xy[0] and abs(other_xy[1] - pt_xy[1]) <= EPSILON:
                 label = 4
             else:
-                status = False
-                err_msg = 'invalid point connections, duplication'
-                print(err_msg)
-                return None, status, err_msg
+                if ERR_TEMP_SOL:
+                  label = -2 # xyz
+                  print(f'meet error, just ignore it sicne corner types are not used currently (happen while image_size=512 but not in 256)')
+                else:
+                  status = False
+                  err_msg = 'invalid point connections, duplication'
+                  print(err_msg)
+                  return None, status, err_msg
         elif len(list_others) == 2 or len(list_others) == 3:
             position_str = ''
             for other in list_others:
@@ -121,9 +127,13 @@ def _get_corner_type(points, lines, point_dict, allow_non_manhattan=False):
                 else:
                     label = shape_dict[position_str]
             except Exception as e:
-                status = False
-                err_msg = 'invalid connections combination, missing edges'
-                return None, status, err_msg
+                if ERR_TEMP_SOL:
+                  label = -2 # xyz
+                  print(f'meet error, just ignore it sicne corner types are not used currently (happen while image_size=512 but not in 256)')
+                else:
+                  status = False
+                  err_msg = 'invalid connections combination, missing edges'
+                  return None, status, err_msg
         else:
             # todo: might further check here
             assert len(list_others) >= 4
@@ -274,6 +284,8 @@ class RecordWriter:
         self.room_write_base = os.path.join(self.room_base_dir, phase)
         if not os.path.exists(self.room_write_base):
             os.mkdir(self.room_write_base)
+        if ONLY_NOT_EXIST:
+          self.rm_fields_exists()
 
     def get_filepaths(self):
         ply_filenames = sorted(os.listdir(self.ply_base_dir))
@@ -306,7 +318,29 @@ class RecordWriter:
 
         return ply_file_paths, annot_file_paths
 
+    def rm_fields_exists(self):
+        self.ply_paths, self.annot_paths
+        valid_ids = []
+        n0 = len(self.ply_paths)
+        for i in range(n0):
+          file_id = os.path.basename(self.ply_paths[i]).split('.')[0]
+          #if file_id == 'JW2-KX2A-3FQkoQkR7kpC7':
+          #  valid_ids.append(i)
+          #else:
+          #  continue
+
+          output_path = os.path.join(self.room_write_base, file_id + '.npy')
+          if not os.path.exists(output_path):
+            valid_ids.append(i)
+        self.ply_paths = [self.ply_paths[i] for i in valid_ids]
+        self.annot_paths = [self.annot_paths[i] for i in valid_ids]
+        n1 = len(self.ply_paths)
+        print(f'org:{n0}, valid:{n1}')
+        pass
+
     def write(self):
+        if len(self.ply_paths) == 0:
+          return
         succ_count = 0
 
         room_metadata = {
@@ -662,7 +696,9 @@ class RecordWriter:
 
 
 if __name__ == '__main__':
-    base_dir = '../data/public_100/processed'
-    record_writer_test = RecordWriter(num_points=50000, base_dir=base_dir, phase='test', im_size=256,
+    image_size = 512
+    base_dir = f'../data/public_100/processed_{image_size}'
+    record_writer_test = RecordWriter(num_points=50000, base_dir=base_dir, phase='test', im_size=image_size,
                                       save_prefix='beike_100', allow_non_man=True, all_test=True)
+
     record_writer_test.write()
